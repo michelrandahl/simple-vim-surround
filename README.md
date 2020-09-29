@@ -1,6 +1,12 @@
 # simple-vim-surround
 A vim plugin with simplified vim-surround behavior
 
+## Keybindings summary
+* Delete surrounding: `ds<char>`
+* Change surrounding: `cs<old_char><new_char>`
+* Surround current line: `yss<char>`
+* Surround visual selection: `S<char>`
+
 ## Delete surrounding chars
 Delete surrounding chars by pressing `ds<char>`.
 
