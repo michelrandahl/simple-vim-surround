@@ -1,6 +1,18 @@
 # simple-vim-surround
 A vim plugin with simplified vim-surround behavior
 
+## Install
+### SpaceVim
+Add following to init.toml
+```
+[[custom_plugins]]
+    repo = "michelrandahl/simple-vim-surround"
+    merged = false
+```
+
+### Plug
+Add `Plug 'michelrandahl/simple-vim-surround'`
+
 ## Keybindings summary
 * Delete surrounding: `ds<char>`
 * Change surrounding: `cs<old_char><new_char>`
