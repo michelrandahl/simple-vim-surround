@@ -1,48 +1,3 @@
-function! s:DeleteSurrounding(char_num) abort
-  let saved_unnamed_register = @@
-  let char = nr2char(a:char_num)
-  silent execute "normal! " . "vi" . char . "\e"
-  let [line_start, column_start] = getpos("'<")[1:2]
-  let [line_end, column_end] = getpos("'>")[1:2]
-  if line_start ==# line_end
-    silent execute "normal! " . "di" . char . "vh" . "p"
-  else
-    let old_sw = &sw
-    set sw=1
-    silent execute "normal! " . "di" . char . "vh" . "p" . "j" . line_end . "<gg"
-    let &sw = old_sw
-  endif
-  let @@ = saved_unnamed_register
-endfunction
-
-function! s:SurroundWithChars(vmode, line_start, line_end, column_start, column_end, char1, char2) abort
-  if a:line_start ==# a:line_end
-    let insertBeginning = join([a:column_start, '|', 'i', a:char1], "")
-    " NOTE: when vmode is 'V', column_end is some arbitrary big number
-    let insertEnd = a:vmode ==# 'v'
-                    \ ? join([a:column_end, '|l', 'a', a:char2], "")
-                    \ : join(['A', a:char2], "")
-    silent execute 'normal! ' . insertBeginning . "\e" . insertEnd
-  else
-    let insertBeginning = join([a:line_start, 'gg',
-                               \ a:column_start, '|',
-                               \ 'i', a:char1], "")
-    " NOTE: when vmode is 'V', column_end is some arbitrary big number
-    let insertEnd = a:vmode ==# 'v'
-                    \ ? join(['j', a:line_end, '>gg',
-                             \ a:line_end, 'gg',
-                             \ a:column_end, '|',
-                             \ 'la', a:char2], "")
-                    \ : join(['j', a:line_end, '>gg',
-                             \ a:line_end, 'gg',
-                             \ "A", a:char2], "")
-    let old_sw = &sw
-    set sw=1
-    silent execute 'normal! ' . insertBeginning . "\e" . insertEnd
-    let &sw = old_sw
-  endif
-endfunction
-
 function! s:ChooseChars(char) abort
   if a:char ==# '(' || a:char ==# ')'
     return ['(', ')']
@@ -55,13 +10,44 @@ function! s:ChooseChars(char) abort
   endif
 endfunction
 
-function! s:ChangeSurround(old_char, new_char) abort
+function! s:GetcharAtPosition() abort
+  return strcharpart(strpart(getline('.'), col('.') - 1), 0, 1)
+endfunction
+
+function! s:DeleteSurrounding(char_num) abort
   let saved_unnamed_register = @@
+  let char = nr2char(a:char_num)
+  silent execute "normal! " . "va" . char . "\e"
+  let [line_start, column_start] = getpos("'<")[1:2]
+  let [line_end, column_end] = getpos("'>")[1:2]
+  silent execute "normal! " . line_end . "gg" . column_end . "|" . "x" .
+                            \ line_start . "gg" . column_start . "|" . "x"
+  let @@ = saved_unnamed_register
+endfunction
+
+function! s:ChangeSurround(old_char, new_char) abort
   let old = nr2char(a:old_char)
   let new = nr2char(a:new_char)
   let [open_char, close_char] = <SID>ChooseChars(new)
-  silent execute "normal! " . "di" . old . "r" . close_char . "hr" . open_char . "p"
-  let @@ = saved_unnamed_register
+  if open_char ==# '(' || open_char ==# '[' || open_char ==# '{'
+    silent execute "normal! " . "va" . old . "\e"
+    let [line_start, column_start] = getpos("'<")[1:2]
+    let [line_end, column_end] = getpos("'>")[1:2]
+    echomsg line_start . "," . column_start . " " . line_end . "," . column_end
+    silent execute "normal! " . line_start . "gg" . column_start . "|" . "r" . open_char .
+                              \ line_end . "gg" . column_end . "|" . "r" . close_char
+  else
+    silent execute "normal! " . "vi" . old . "\e"
+    let [line_start, column_start] = getpos("'<")[1:2]
+    let [line_end, column_end] = getpos("'>")[1:2]
+    if old ==# s:GetcharAtPosition()
+      silent execute "normal! " . column_start . "|" . "r" . new
+                                \ column_end . "|" . "r" . new
+    else
+      silent execute "normal! " . column_end . "|l" . "r" . new .
+                                \ column_start . "|h" . "r" . new
+    endif
+  endif
 endfunction
 
 function! s:SurroundWith(vmode, char_num) abort
@@ -69,7 +55,13 @@ function! s:SurroundWith(vmode, char_num) abort
   let [line_start, column_start] = getpos("'<")[1:2]
   let [line_end, column_end] = getpos("'>")[1:2]
   let [open_char, close_char] = <SID>ChooseChars(char)
-  call <SID>SurroundWithChars(a:vmode, line_start, line_end, column_start, column_end, open_char, close_char)
+  if a:vmode ==# "v"
+    silent execute "normal! " . line_end . "gg" . column_end . "|" . "a" . close_char . "\e" .
+                              \ line_start . "gg" . column_start . "|" . "i" . open_char
+  elseif a:vmode ==# "V"
+    silent execute "normal! " . line_end . "gg" . "o" . close_char . "\e" .
+                              \ line_start . "gg" . "O" . open_char
+  endif
 endfunction
 
 function! s:SurroundLine(char_num) abort
