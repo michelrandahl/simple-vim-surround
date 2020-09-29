@@ -13,11 +13,15 @@ Add following to init.toml
 ### Plug
 Add `Plug 'michelrandahl/simple-vim-surround'`
 
-## Keybindings summary
+---
+
+# Keybindings summary
 * Delete surrounding: `ds<char>`
 * Change surrounding: `cs<old_char><new_char>`
 * Surround current line: `yss<char>`
 * Surround visual selection: `S<char>`
+
+---
 
 ## Delete surrounding chars
 Delete surrounding chars by pressing `ds<char>`.
@@ -167,6 +171,8 @@ lorem
 ipsum
 )
 ```
+
+---
 
 # Motivation for the plugin
 The classic vim-surround didn't work the same way that I was used to with evil-mode in spacemacs, so I decided to write my own simplified version of vim-surround. Furthermore did I wish to learn vim scripting, so this is my first attempt ever at making a vim plugin.
