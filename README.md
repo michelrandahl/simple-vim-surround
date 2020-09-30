@@ -10,6 +10,12 @@ Add following to init.toml
     merged = false
 ```
 
+And under `[options]` add vim-surround to the list of disabled plugins, to make the keybindings available to simple-vim-surround.
+```
+[options]
+    disabled_plugins = ["vim-surround"]
+```
+
 ### Plug
 Add `Plug 'michelrandahl/simple-vim-surround'`
 
