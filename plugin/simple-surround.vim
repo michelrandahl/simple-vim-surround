@@ -33,7 +33,6 @@ function! s:ChangeSurround(old_char, new_char) abort
     silent execute "normal! " . "va" . old . "\e"
     let [line_start, column_start] = getpos("'<")[1:2]
     let [line_end, column_end] = getpos("'>")[1:2]
-    echomsg line_start . "," . column_start . " " . line_end . "," . column_end
     silent execute "normal! " . line_start . "gg" . column_start . "|" . "r" . open_char .
                               \ line_end . "gg" . column_end . "|" . "r" . close_char
   else
