@@ -55,15 +55,25 @@ With the cursor at the word `foobar` press `ds[` to delete surrounding `[]`
 ```
 #### Example 3
 ```
-[ foobar
-  , blabla
-  , stuff [] [lorem ipsum]]
+viewRelatedPhoto : String -> Html Msg
+viewRelatedPhoto url =
+    img
+        [ class "related-photo"
+        , onClick (ClickedPhoto url)
+        , src (urlPrefix ++ "photos/" ++ url ++ "/thumb")
+        ]
+        []
 ```
-With the cursor at the word `lorem` press `ds[` to delete surrounding `[]`
+With the cursor at the word `class` press `ds[` to delete surrounding `[]`
 ```
-[ foobar
-  , blabla
-  , stuff [] lorem ipsum]
+viewRelatedPhoto : String -> Html Msg
+viewRelatedPhoto url =
+    img
+         class "related-photo"
+        , onClick (ClickedPhoto url)
+        , src (urlPrefix ++ "photos/" ++ url ++ "/thumb")
+        
+        []
 ```
 ### Current limitations and bugs
 Deleting surrounding chars, where the chars are on different lines, only works for the chars `()[]{}`.
