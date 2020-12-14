@@ -20,6 +20,17 @@ And under `[options]` add vim-surround to the list of disabled plugins, to make 
 Add `Plug 'michelrandahl/simple-vim-surround'`
 
 ---
+## Recommended options in Vim init file
+By default Vim/Neovim cannot figure out the correct scope of parantheses if a backslash is involved. This is a problem if you are editing Code with a Haskell-like-syntax for anonomous functions, for example:
+```
+(\(x,y) -> ...)
+```
+Luckily this can be solved with a Vim `cpoption` (lookup `:help cpoptions` and view existing cpoptions with `:set cpoptions?`):
+```
+set cpoptions+=M
+```
+
+---
 
 # Keybindings summary
 * Delete surrounding: `ds<char>`
