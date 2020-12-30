@@ -14,14 +14,22 @@ function! s:GetcharAtPosition() abort
   return strcharpart(strpart(getline('.'), col('.') - 1), 0, 1)
 endfunction
 
+" TODO: test if the char is a " or ' and then behave differently for that one
 function! s:DeleteSurrounding(char_num) abort
   let saved_unnamed_register = @@
   let char = nr2char(a:char_num)
-  silent execute "normal! " . "va" . char . "\e"
-  let [line_start, column_start] = getpos("'<")[1:2]
-  let [line_end, column_end] = getpos("'>")[1:2]
-  silent execute "normal! " . line_end . "gg" . column_end . "|" . "x" .
-                            \ line_start . "gg" . column_start . "|" . "x"
+  let [open_char, close_char] = <SID>ChooseChars(char)
+
+  if open_char ==# '(' || open_char ==# '[' || open_char ==# '{'
+    silent execute "normal! " . "va" . char . "\e"
+    let [line_start, column_start] = getpos("'<")[1:2]
+    let [line_end, column_end] = getpos("'>")[1:2]
+    silent execute "normal! " . line_end . "gg" . column_end . "|" . "x" .
+                              \ line_start . "gg" . column_start . "|" . "x"
+  else
+    silent execute "normal! " . "vi" . char . "y" . "\e"
+    silent execute "normal! " . "v2i" . char . "p" . "\e"
+  endif
   let @@ = saved_unnamed_register
 endfunction
 
@@ -29,6 +37,7 @@ function! s:ChangeSurround(old_char, new_char) abort
   let old = nr2char(a:old_char)
   let new = nr2char(a:new_char)
   let [open_char, close_char] = <SID>ChooseChars(new)
+
   if open_char ==# '(' || open_char ==# '[' || open_char ==# '{'
     silent execute "normal! " . "va" . old . "\e"
     let [line_start, column_start] = getpos("'<")[1:2]

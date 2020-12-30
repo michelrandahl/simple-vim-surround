@@ -1,5 +1,8 @@
 # simple-vim-surround
-A vim plugin with simplified vim-surround behavior
+A vim plugin with simplified vim-surround behavior.
+
+### Motivation for the plugin
+*I found some unexpected behavior in the classic vim-surround plugin while coding in Elm and trying to manipulate surrounding square brackets (see examples below). Being relative new to vim-scripting, I found the code in vim-surround plugin too complicated to understand, so I decided to write my own simplified version of the plugin.*
 
 ## Install
 ### SpaceVim
@@ -20,15 +23,29 @@ And under `[options]` add vim-surround to the list of disabled plugins, to make 
 Add `Plug 'michelrandahl/simple-vim-surround'`
 
 ---
-## Recommended options in Vim init file
-By default Vim/Neovim cannot figure out the correct scope of parantheses if a backslash is involved. This is a problem if you are editing Code with a Haskell-like-syntax for anonomous functions, for example:
+## Other recommended options in Vim init file
+### Selection in Haskell-style anonomous functions
+By default Vim/Neovim cannot figure out the correct scope of parantheses if a backslash is involved. This is a problem if you are editing code with a Haskell-like-syntax for anonomous functions, for example:
 ```
 (\(x,y) -> ...)
 ```
-Luckily this can be solved with a Vim `cpoption` (lookup `:help cpoptions` and view existing cpoptions with `:set cpoptions?`):
+Luckily this can be solved with a Vim `cpoption` (lookup `:help cpoptions` and view existing cpoptions with `:set cpoptions?`). Add following to your init.vim, to solve the problem:
 ```
 set cpoptions+=M
 ```
+
+### Avoid selection of leading whitespace when selecting strings
+By default Vim/Neovim will select any leading whitespace when selecting a string using `va`. For example, when standing on `f` in the following code and typing `va"` in normal mode, Vim will select `' "foobar"'`, -this can be quite annoying if you only intend to select `"foobar"`.
+```
+, "foobar"
+```
+If you don't want to include leading whitespace, you can add following remapings to your vim.init:
+```
+nnoremap va' v2i'
+nnoremap va" v2i"
+nnoremap va` v2i`
+```
+
 
 ---
 
@@ -199,7 +216,3 @@ ipsum
 )
 ```
 
----
-
-# Motivation for the plugin
-The classic vim-surround didn't work the same way that I was used to with evil-mode in spacemacs, so I decided to write my own simplified version of vim-surround. Furthermore did I wish to learn vim scripting, so this is my first attempt ever at making a vim plugin.
